@@ -40,8 +40,8 @@ public class Topic implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         Topic that = (Topic) o;
         return uuid.equals(that.uuid);
     }
@@ -50,4 +50,5 @@ public class Topic implements Serializable {
     public int hashCode() {
         return Objects.hash(uuid);
     }
+
 }

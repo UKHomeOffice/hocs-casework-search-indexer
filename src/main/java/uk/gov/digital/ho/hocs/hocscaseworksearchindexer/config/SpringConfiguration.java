@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.text.SimpleDateFormat;
 
 @Configuration
-public class SpringConfiguration  {
+public class SpringConfiguration {
 
     @Bean
     public ObjectMapper initialiseObjectMapper() {
@@ -24,4 +24,5 @@ public class SpringConfiguration  {
         m.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         return m;
     }
+
 }

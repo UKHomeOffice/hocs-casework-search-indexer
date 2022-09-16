@@ -4,6 +4,7 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -19,12 +20,11 @@ import java.util.stream.Collectors;
 @Setter
 public class CaseData implements Serializable {
 
-
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Id
-    @Column(name = "uuid", columnDefinition ="uuid")
+    @Column(name = "uuid", columnDefinition = "uuid")
     private UUID uuid;
 
     @Column(name = "created")
@@ -80,8 +80,8 @@ public class CaseData implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         CaseData that = (CaseData) o;
         return uuid.equals(that.uuid);
     }

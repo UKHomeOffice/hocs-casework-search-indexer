@@ -41,8 +41,4 @@ management:
         enabled: true
 
 
-logging:
-  level:
-    org:
-      hibernate:
-        stat: DEBUG
+batch-size: 200

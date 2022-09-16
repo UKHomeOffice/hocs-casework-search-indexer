@@ -51,8 +51,8 @@ public class SomuItem implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         SomuItem that = (SomuItem) o;
         return uuid.equals(that.uuid);
     }

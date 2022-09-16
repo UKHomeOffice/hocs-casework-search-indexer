@@ -1,5 +1,5 @@
 apiVersion: v2
-name: hocs-casework
+name: hocs-casework-search-indexer
 version: 1.0.0
 dependencies:
   - name: hocs-backend-service

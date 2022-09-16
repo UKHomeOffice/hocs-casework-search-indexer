@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -76,8 +77,8 @@ public class Correspondent implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         Correspondent that = (Correspondent) o;
         return uuid.equals(that.uuid);
     }
@@ -86,4 +87,5 @@ public class Correspondent implements Serializable {
     public int hashCode() {
         return Objects.hash(uuid);
     }
+
 }

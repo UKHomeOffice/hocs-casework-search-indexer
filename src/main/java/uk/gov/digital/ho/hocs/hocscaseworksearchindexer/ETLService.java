@@ -10,18 +10,25 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.Correspondent;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.SomuItem;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.Topic;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.repository.CaseRepository;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.CaseData;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
 @Service
 public class ETLService {
+
+    private int batchSize;
 
     private final CaseRepository caseRepository;
 
@@ -34,7 +41,12 @@ public class ETLService {
     @PersistenceContext
     protected EntityManager entityManager;
 
-    public ETLService(CaseRepository caseRepository, RestHighLevelClient client, ObjectMapper objectMapper, @Value("${aws.es.index-prefix}") String prefix) {
+    public ETLService(@Value("${batch-size}") int batchSize,
+                      CaseRepository caseRepository,
+                      RestHighLevelClient client,
+                      ObjectMapper objectMapper,
+                      @Value("${aws.es.index-prefix}") String prefix) {
+        this.batchSize = batchSize;
         this.caseRepository = caseRepository;
         this.client = client;
         this.objectMapper = objectMapper;
@@ -46,16 +58,14 @@ public class ETLService {
 
         AtomicInteger count = new AtomicInteger(0);
         try (Stream<CaseData> cases = caseRepository.getAllCasesAndCollections()) {
-            Iterators.partition(cases.iterator(), 200).forEachRemaining(batch -> {
+            Iterators.partition(cases.iterator(), batchSize).forEachRemaining(batch -> {
                 BulkRequest bulkRequest = new BulkRequest();
                 batch.forEach(caseData -> {
                     count.incrementAndGet();
                     log.info("Indexing case {} for UUID {}", count, caseData.getUuid());
                     entityManager.detach(caseData);
                     bulkRequest.add(
-                            new IndexRequest(index)
-                                    .id(caseData.getUuid().toString())
-                                    .source(mapCaseData(caseData)));
+                        new IndexRequest(index).id(caseData.getUuid().toString()).source(mapCaseData(caseData)));
                 });
 
                 try {
@@ -69,8 +79,6 @@ public class ETLService {
 
     private Map<String, Object> mapCaseData(CaseData caseData) {
         Map<String, Object> indexMap = new HashMap<>();
-
-        indexMap.put("uuid", caseData.getUuid());
 
         if (caseData.getReference() != null) {
             indexMap.put("reference", caseData.getReference());
@@ -95,16 +103,55 @@ public class ETLService {
         }
 
         indexMap.put("deleted", caseData.isDeleted());
-        indexMap.put("completed", caseData.isCompleted());
+        indexMap.put("caseUUID", caseData.getUuid());
         indexMap.put("data", caseData.getDataMap());
-        indexMap.put("currentCorrespondents", caseData.getCurrentCorrespondents());
-        indexMap.put("allCorrespondents", caseData.getCorrespondents());
-        indexMap.put("currentTopics", caseData.getCurrentTopics());
-        indexMap.put("allTopics", caseData.getTopics());
-        indexMap.put("allSomuItems", caseData.getSomuItems());
+        indexMap.put("currentCorrespondents", mapCorrespondents(caseData.getCurrentCorrespondents()));
+        indexMap.put("allCorrespondents", mapCorrespondents(caseData.getCorrespondents()));
+        indexMap.put("currentTopics", mapTopics(caseData.getCurrentTopics()));
+        indexMap.put("allTopics", mapTopics(caseData.getTopics()));
+        indexMap.put("allSomuItems", mapSomuItems(caseData.getSomuItems()));
 
         return objectMapper.convertValue(indexMap, Map.class);
     }
 
 
+    private List<Map<String, Object>> mapCorrespondents(Set<Correspondent> correspondents) {
+        return correspondents.stream().map(correspondent -> {
+            Map<String, Object> indexMap = new HashMap<>();
+            indexMap.put("address1", correspondent.getAddress1());
+            indexMap.put("address2", correspondent.getAddress2());
+            indexMap.put("address3", correspondent.getAddress3());
+            indexMap.put("country", correspondent.getCountry());
+            indexMap.put("created", correspondent.getCreated());
+            indexMap.put("externalKey", correspondent.getExternalKey());
+            indexMap.put("fullname", correspondent.getFullName());
+            indexMap.put("postcode", correspondent.getPostcode());
+            indexMap.put("reference", correspondent.getReference());
+            indexMap.put("telephone", correspondent.getTelephone());
+            indexMap.put("email", correspondent.getEmail());
+            indexMap.put("uuid", correspondent.getUuid());
+            indexMap.put("type", correspondent.getCorrespondentType());
+            return indexMap;
+        }).collect(Collectors.toList());
+    }
+
+    private List<Map<String,Object>> mapSomuItems(Set<SomuItem> somuItems) {
+        return somuItems.stream().map(somuItem -> {
+            Map<String, Object> indexMap = new HashMap<>();
+            indexMap.put("uuid", somuItem.getUuid());
+            indexMap.put("somuTypeUuid", somuItem.getSomuUuid());
+            indexMap.put("data", somuItem.getData());
+            return indexMap;
+        }).collect(Collectors.toList());
+    }
+
+    private List<Map<String,Object>> mapTopics(Set<Topic> topics) {
+        return topics.stream().map(topic -> {
+            Map<String, Object> indexMap = new HashMap<>();
+            indexMap.put("uuid", topic.getTextUUID());
+            indexMap.put("text", topic.getText());
+            return indexMap;
+        }).collect(Collectors.toList());
+
+    }
 }
