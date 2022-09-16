@@ -1,0 +1,12 @@
+management:
+health:
+  elasticsearch:
+    enabled: false
+
+aws:
+  region: eu-west-2
+  es:
+    host: localhost.localstack.cloud
+    port: 4566
+    results-limit: 500
+    index-prefix: local

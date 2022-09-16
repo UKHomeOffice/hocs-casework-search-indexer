@@ -1,0 +1,11 @@
+name: 'Test'
+on:
+  pull_request:
+    types: [ opened, reopened, synchronize ]
+
+jobs:
+  test:
+    uses: UKHomeOffice/hocs-github-actions/.github/workflows/test-gradle.yml@v2
+    with:
+      components: 'localstack'
+      elastic: 'true'

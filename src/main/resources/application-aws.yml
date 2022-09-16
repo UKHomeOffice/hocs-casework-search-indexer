@@ -1,0 +1,9 @@
+aws:
+  region: eu-west-2
+  es:
+    access-key: ${elasticsearch.access.key}
+    secret-key: ${elasticsearch.secret.key}
+    host: ${elasticsearch.host}
+    serviceName: es
+    results-limit: 500
+    index-prefix: ${elasticsearch.index.prefix}
