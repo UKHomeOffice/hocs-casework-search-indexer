@@ -21,11 +21,8 @@ spring:
         temp:
           use_jdbc_metadata_defaults: 'false'
         format_sql: 'true'
-        show_sql: 'true'
+        show_sql: 'false'
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  flyway:
-    schemas: ${db.schema.name:casework}
-    locations: classpath:/db/migration/postgresql
   main:
     banner-mode: 'off'
   datasource:
@@ -41,4 +38,7 @@ management:
         enabled: true
 
 
-batch-size: 200
+mode: MULTIPLE
+new-index: false
+batch.size: 300
+batch.interval: 200
