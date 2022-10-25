@@ -1,13 +1,18 @@
 ---
-hocs-backend-service:
-  nameOverride: hocs-casework-search-indexer
 
-  app:
-    image:
-      repository: quay.io/ukhomeofficedigital/hocs-casework-search-indexer
-    resources:
-      limits:
-        cpu: 2000m
-        memory: 2048Mi
-      requests:
-        memory: 2048Mi
+app:
+  image:
+    repository: quay.io/ukhomeofficedigital/hocs-casework-search-indexer
+  resources:
+    limits:
+      cpu: 2000m
+      memory: 4096Mi
+    requests:
+      memory: 4096Mi
+  mode: MULTIPLE
+  newIndex: false
+  batchSize: 200
+  batchInterval: 500
+  elasticPrefix: '{{ .Release.Namespace }}-latest'
+
+

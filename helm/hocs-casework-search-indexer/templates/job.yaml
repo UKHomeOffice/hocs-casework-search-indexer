@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rebuild-es-indexes
+  labels:
+    version: {{ .Values.version }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: hocs-casework-search-indexer
+          image:  '{{ .Values.app.image.repository }}:{{ .Values.version }}'
+          env:
+            {{ include "deployment.envs" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.app.resources | nindent 12 }}
+      restartPolicy: Never
