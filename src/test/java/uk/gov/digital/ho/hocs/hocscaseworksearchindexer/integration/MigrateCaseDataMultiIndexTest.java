@@ -54,7 +54,7 @@ class MigrateCaseDataMultiIndexTest {
 
         etlService.migrate();
 
-        var getRequest = new GetRequest(String.format("%s-case", prefix), "14915b78-6977-42db-b343-0915a7f412a1");
+        var getRequest = new GetRequest(String.format("%s-test", prefix), "14915b78-6977-42db-b343-0915a7f412a1");
         var getResponse = highLevelClient.get(getRequest, RequestOptions.DEFAULT);
         var responseJson = getResponse.getSourceAsString();
 
