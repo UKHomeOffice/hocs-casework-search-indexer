@@ -57,6 +57,9 @@ public class ETLService {
 
     private DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
 
+    private final  String databaseName;
+
+
     @PersistenceContext
     protected EntityManager entityManager;
 
@@ -69,7 +72,8 @@ public class ETLService {
                       @Value("${mode}") IndexMode indexMode,
                       @Value("${new-index}") boolean newIndex,
                       CaseRepository caseRepository,
-                      @Value("${batch.interval}") int batchInterval) {
+                      @Value("${batch.interval}") int batchInterval,
+                      @Value("${db.name}") String databaseName) {
         this.batchSize = batchSize;
         this.newIndex = newIndex;
         this.caseRepository = caseRepository;
@@ -79,11 +83,19 @@ public class ETLService {
         this.liveIndex = String.format("%s-%s", prefix, "case");
         this.indexMode = indexMode;
         this.batchInterval = batchInterval;
+        this.databaseName = databaseName;
         this.timestamp = dateFormat.format(Date.from(Instant.now()));
     }
 
     @Transactional(readOnly = true)
-    public void migrate() throws IOException {
+    public void migrate() throws IOException, InterruptedException {
+
+        log.info("Indexing Mode: {}", indexMode);
+        log.info("Create New Index: {}", newIndex);
+        log.info("Batch Size: {}", batchSize);
+        log.info("Batch Interval: {}", batchInterval);
+        log.info("Indexing cases from {} to index with prefix {}", databaseName, prefix);
+        Thread.sleep(6000);
 
         if (newIndex) {
             createNewIndexes();
