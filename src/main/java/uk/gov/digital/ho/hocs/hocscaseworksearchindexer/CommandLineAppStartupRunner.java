@@ -18,14 +18,10 @@ public class CommandLineAppStartupRunner implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws IOException {
+    public void run(String... args) throws IOException, InterruptedException {
         log.info("Application started");
-
-        for (int i = 0; i < args.length; ++i) {
-           log.info("args[{}]: {}", i, args[i]);
-        }
         ETLService.migrate();
-        log.info("Migration completed successfully");
+        log.info("Migration completed successfully, exiting");
         System.exit(0);
     }
 

@@ -45,7 +45,7 @@ class MigrateCaseDataTest {
     private String prefix;
 
     @Test
-    void createsCaseDocumentFromCaseData() throws IOException {
+    void createsCaseDocumentFromCaseData() throws IOException, InterruptedException {
 
         String expectedJSON =  Files.readString(new ClassPathResource("elastic-search/case-data.json").getFile().toPath());
 
