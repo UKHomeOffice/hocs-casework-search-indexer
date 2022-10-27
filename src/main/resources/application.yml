@@ -38,7 +38,7 @@ management:
         enabled: true
 
 
-mode: MULTIPLE
+mode: SINGULAR
 new-index: false
 batch.size: 300
 batch.interval: 200
