@@ -6,9 +6,10 @@ app:
   resources:
     limits:
       cpu: 2000m
-      memory: 4096Mi
+      memory: 2048Mi
     requests:
-      memory: 4096Mi
+      cpu: 2000m
+      memory: 2048Mi
   mode: MULTIPLE
   newIndex: false
   batchSize: 200
