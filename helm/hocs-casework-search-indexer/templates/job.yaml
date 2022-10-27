@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rebuild-es-indexes
+  name: rebuild-os-indexes
   labels:
     version: {{ .Values.version }}
 spec:
