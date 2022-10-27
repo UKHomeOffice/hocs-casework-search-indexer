@@ -73,7 +73,7 @@ public class ETLService {
                       @Value("${new-index}") boolean newIndex,
                       CaseRepository caseRepository,
                       @Value("${batch.interval}") int batchInterval,
-                      @Value("${db.name}") String databaseName) {
+                      @Value("${db.name:unset}") String databaseName) {
         this.batchSize = batchSize;
         this.newIndex = newIndex;
         this.caseRepository = caseRepository;
