@@ -35,9 +35,6 @@ import static org.springframework.test.context.jdbc.SqlConfig.TransactionMode.IS
 class MigrateCaseDataMultiIndexTest {
 
     @Autowired
-    public ObjectMapper objectMapper;
-
-    @Autowired
     private RestHighLevelClient highLevelClient;
 
     @Autowired

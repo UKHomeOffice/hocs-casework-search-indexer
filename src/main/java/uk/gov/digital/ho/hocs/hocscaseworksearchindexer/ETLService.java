@@ -119,7 +119,8 @@ public class ETLService {
                     client.bulk(bulkRequest, RequestOptions.DEFAULT);
                     Thread.sleep(batchInterval);
                 } catch (IOException | InterruptedException e) {
-                    log.error("Error indexing batch", e);
+                    log.error("Error indexing batch ", e.getMessage());
+                    throw new ElasticSearchFailureException("Failed to index batch", e);
                 }
             });
         }
