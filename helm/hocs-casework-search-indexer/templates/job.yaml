@@ -6,6 +6,10 @@ metadata:
     version: {{ .Values.version }}
 spec:
   template:
+    metadata:
+      labels:
+        name: hocs-casework-search-indexer
+        role: hocs-backend
     spec:
       containers:
         - name: hocs-casework-search-indexer
