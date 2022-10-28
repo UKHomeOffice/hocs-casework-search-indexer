@@ -4,12 +4,6 @@ info:
     fullname: Hocs Casework to Search Indexer Service
     version: ${version:0.0.1}
 
-server:
-  shutdown: graceful
-  port: '8096'
-  http2:
-    enabled: 'true'
-
 spring:
   jpa:
     properties:
@@ -28,17 +22,7 @@ spring:
   datasource:
     url: jdbc:postgresql://${db.host:localhost}:${db.port:5432}/${db.name:postgres}?currentSchema=${db.schema.name:casework}&user=${db.username:root}&password=${db.password:dev}&stringtype=unspecified
 
-management:
-  endpoints:
-    enabled-by-default: false
-  endpoint:
-    health:
-      enabled: true
-      probes:
-        enabled: true
-
-
 mode: SINGULAR
 new-index: false
-batch.size: 300
+batch.size: 1000
 batch.interval: 200

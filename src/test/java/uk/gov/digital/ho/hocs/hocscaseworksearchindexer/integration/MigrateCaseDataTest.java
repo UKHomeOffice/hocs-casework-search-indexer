@@ -33,9 +33,6 @@ import static org.springframework.test.context.jdbc.SqlConfig.TransactionMode.IS
 class MigrateCaseDataTest {
 
     @Autowired
-    public ObjectMapper objectMapper;
-
-    @Autowired
     private RestHighLevelClient highLevelClient;
 
     @Autowired
@@ -43,7 +40,6 @@ class MigrateCaseDataTest {
 
     @Value("${aws.es.index-prefix}")
     private String prefix;
-
     @Test
     void createsCaseDocumentFromCaseData() throws IOException, InterruptedException {
 
