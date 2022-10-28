@@ -26,7 +26,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-aws-messaging:2.2.6.RELEASE'
     implementation 'com.vladmihalcea:hibernate-types-55:2.19.0'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
-    implementation 'com.github.awslabs:aws-request-signing-apache-interceptor:b3772780da'
+    implementation 'software.amazon.awssdk:auth:2.18.0'
     implementation "org.elasticsearch:elasticsearch:${elasticVersion}"
     implementation "org.elasticsearch.client:elasticsearch-rest-client:${elasticVersion}"
     implementation "org.elasticsearch:elasticsearch-core:${elasticVersion}"
