@@ -1,0 +1,69 @@
+{
+  "caseUUID": "14915b78-6977-42db-b343-0915a7f412a1",
+  "allCorrespondents": [
+    {
+      "country": "England",
+      "address3": "South Yorkshire",
+      "address2": "Sheffield",
+      "address1": "1 SomeWhere Close",
+      "created": "2018-12-14T12:00:00",
+      "postcode": "S1 1DJ",
+      "telephone": "01142595959",
+      "type": "Member",
+      "uuid": "2c9e1eb9-ee78-4f57-a626-b8b75cf3b937",
+      "reference": "1",
+      "externalKey": "external_key_1",
+      "fullname": "Bob Someone",
+      "email": "a@a.com"
+    }
+  ],
+  "currentCorrespondents": [
+    {
+      "country": "England",
+      "address3": "South Yorkshire",
+      "address2": "Sheffield",
+      "address1": "1 SomeWhere Close",
+      "created": "2018-12-14T12:00:00",
+      "postcode": "S1 1DJ",
+      "telephone": "01142595959",
+      "type": "Member",
+      "uuid": "2c9e1eb9-ee78-4f57-a626-b8b75cf3b937",
+      "reference": "1",
+      "externalKey": "external_key_1",
+      "fullname": "Bob Someone",
+      "email": "a@a.com"
+    }
+  ],
+  "data": {
+    "DateReceived": "2018-01-01"
+  },
+  "created": "2018-12-14T12:00:00",
+  "type": "TEST",
+  "reference": "TEST/9990190/18",
+  "primaryCorrespondent": "2c9e1eb9-ee78-4f57-a626-b8b75cf3b937",
+  "allTopics": [
+    {
+      "text": "SomeText",
+      "uuid": "66800cca-4e77-4345-85fc-c9624fa255cd"
+    }
+  ],
+  "currentTopics": [
+    {
+      "text": "SomeText",
+      "uuid": "66800cca-4e77-4345-85fc-c9624fa255cd"
+    }
+  ],
+  "primaryTopic": "d472a1a9-d32d-46cb-a08a-56c22637c584",
+  "deleted": false,
+  "dateReceived": "2018-01-01",
+  "allSomuItems": [
+    {
+      "somuTypeUuid": "66800cca-4e77-4345-85fc-c9624fa255cd",
+      "data": {
+        "SomeData": "some_data_1"
+      },
+      "uuid": "d472a1a9-d32d-46cb-a08a-56c22637c584"
+    }
+  ],
+  "caseDeadline": "2018-01-29"
+}

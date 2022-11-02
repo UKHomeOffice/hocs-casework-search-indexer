@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.3'
-    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
 }
 
@@ -23,10 +23,9 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-json'
-    implementation 'org.springframework.cloud:spring-cloud-aws-messaging:2.2.6.RELEASE'
-    implementation 'com.vladmihalcea:hibernate-types-55:2.19.0'
+    implementation 'com.vladmihalcea:hibernate-types-55:2.20.0'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
-    implementation 'com.github.awslabs:aws-request-signing-apache-interceptor:b3772780da'
+    implementation 'software.amazon.awssdk:auth:2.18.0'
     implementation "org.elasticsearch:elasticsearch:${elasticVersion}"
     implementation "org.elasticsearch.client:elasticsearch-rest-client:${elasticVersion}"
     implementation "org.elasticsearch:elasticsearch-core:${elasticVersion}"
@@ -34,18 +33,19 @@ dependencies {
     implementation "org.elasticsearch.client:elasticsearch-rest-high-level-client:${elasticVersion}"
     implementation "com.google.guava:guava:31.1-jre"
     annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.springframework:spring-context-indexer:5.3.22'
+    annotationProcessor 'org.springframework:spring-context-indexer:5.3.23'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
-
+    testImplementation 'org.flywaydb:flyway-core:8.5.13'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'net.javacrumbs.json-unit:json-unit-assertj:2.36.0'
 }
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.3"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2021.0.4"
     }
 }
 
@@ -53,6 +53,6 @@ jar {
     enabled = false
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
 }

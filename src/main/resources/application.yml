@@ -4,12 +4,6 @@ info:
     fullname: Hocs Casework to Search Indexer Service
     version: ${version:0.0.1}
 
-server:
-  shutdown: graceful
-  port: '8096'
-  http2:
-    enabled: 'true'
-
 spring:
   jpa:
     properties:
@@ -21,24 +15,14 @@ spring:
         temp:
           use_jdbc_metadata_defaults: 'false'
         format_sql: 'true'
-        show_sql: 'true'
+        show_sql: 'false'
     database-platform: org.hibernate.dialect.PostgreSQLDialect
-  flyway:
-    schemas: ${db.schema.name:casework}
-    locations: classpath:/db/migration/postgresql
   main:
     banner-mode: 'off'
   datasource:
     url: jdbc:postgresql://${db.host:localhost}:${db.port:5432}/${db.name:postgres}?currentSchema=${db.schema.name:casework}&user=${db.username:root}&password=${db.password:dev}&stringtype=unspecified
 
-management:
-  endpoints:
-    enabled-by-default: false
-  endpoint:
-    health:
-      enabled: true
-      probes:
-        enabled: true
-
-
-batch-size: 200
+mode: SINGULAR
+new-index: false
+batch.size: 1000
+batch.interval: 200

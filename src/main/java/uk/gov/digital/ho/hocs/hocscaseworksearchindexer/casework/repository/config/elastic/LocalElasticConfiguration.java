@@ -1,4 +1,4 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.config.elastic;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.repository.config.elastic;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;

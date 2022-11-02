@@ -1,4 +1,4 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.config;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.repository.config;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
