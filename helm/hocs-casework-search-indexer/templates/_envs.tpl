@@ -1,6 +1,6 @@
 {{- define "deployment.envs" }}
 - name: JAVA_OPTS
-  value: '-XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom -Djavax.net.ssl.trustStore=/etc/keystore/truststore.jks -Dhttps.proxyHost=hocs-outbound-proxy.{{ .Values.namespace }}.svc.cluster.local -Dhttps.proxyPort=31290 -Dhttp.nonProxyHosts=*.{{ .Values.namespace }}.svc.cluster.local'
+  value: '-XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom -Dhttps.proxyHost=hocs-outbound-proxy.{{ .Release.Namespace }}.svc.cluster.local -Dhttps.proxyPort=31290 -Dhttp.nonProxyHosts=*.{{ .Release.Namespace }}.svc.cluster.local'
 - name: SPRING_PROFILES_ACTIVE
   value: 'aws'
 - name: MODE
