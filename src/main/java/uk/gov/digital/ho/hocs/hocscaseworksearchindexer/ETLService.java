@@ -3,7 +3,9 @@ package uk.gov.digital.ho.hocs.hocscaseworksearchindexer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -107,7 +110,7 @@ public class ETLService {
                 BulkRequest bulkRequest = new BulkRequest();
                 batch.forEach(caseData -> {
                     count.incrementAndGet();
-                    log.info("Indexing case {} for UUID {}", count, caseData.getUuid());
+                    log.debug("Indexing case {} for UUID {}", count, caseData.getUuid());
                     entityManager.detach(caseData);
 
                     bulkRequest.add(new UpdateRequest(getMigrationIndex(caseData.getType()), caseData.getUuid().toString())
@@ -116,7 +119,11 @@ public class ETLService {
                 });
 
                 try {
-                    client.bulk(bulkRequest, RequestOptions.DEFAULT);
+                    BulkResponse bulkItemResponses = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+                    if (bulkItemResponses.hasFailures()) {
+                        Arrays.stream(bulkItemResponses.getItems()).filter(
+                            BulkItemResponse::isFailed).forEach(i->log.error("Failed to index case {} with error {} in index {}", i.getId(), i.getFailureMessage(), i.getIndex()));
+                    }
                     Thread.sleep(batchInterval);
                 } catch (IOException | InterruptedException e) {
                     log.error("Error indexing batch ", e.getMessage());
