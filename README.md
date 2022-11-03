@@ -31,7 +31,7 @@ file.
 From the project root run:
 
 ```console
-$ docker-compose -f ./ci/docker-compose.yml -f ./ci/docker-compose.elastic.yml up -d localstack
+$ docker-compose -f ./ci/docker-compose.yml -f ./ci/docker-compose.elastic.yml up -d postgres localstack
 ```
 
 > With Docker using 4 GB of memory, this takes approximately 5 minutes to startup.
