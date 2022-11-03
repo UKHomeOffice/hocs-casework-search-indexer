@@ -10,10 +10,10 @@ app:
     requests:
       cpu: 2000m
       memory: 2048Mi
-  mode: MULTIPLE
-  newIndex: false
-  batchSize: 200
-  batchInterval: 500
+  mode: SINGULAR
+  newIndex: 'false'
+  batchSize: '200'
+  batchInterval: '500'
   elasticPrefix: '{{ .Release.Namespace }}-latest'
 
 
