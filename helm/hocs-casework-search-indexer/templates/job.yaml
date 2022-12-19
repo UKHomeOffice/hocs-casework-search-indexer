@@ -4,6 +4,8 @@ metadata:
   name: rebuild-os-indexes
   labels:
     version: {{ .Values.version }}
+    outbound: required
+    database: required
 spec:
   template:
     metadata:
