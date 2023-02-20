@@ -21,12 +21,9 @@ Most modern IDEs will handle pulling this automatically for you, but if not
 $ git submodule update --init --recursive
 ```
 
-## Docker Compose
-
-This repository contains a [Docker Compose](https://docs.docker.com/compose/)
-file.
-
 ### Start localstack (sqs, sns, s3, es)
+
+This project uses the hocs-casework database, so the hocs-casework project must have been started first to run the flyway migrations.
 
 From the project root run:
 
@@ -53,6 +50,25 @@ the ```HocsCaseworkSearchIndexerApplication``` main class.
 
 You need to specify appropriate Spring profiles.
 Paste `development,localstack` into the "Active profiles" box of your run configuration.
+
+## Running in an environment
+
+This project does not automatically deploy to an environment. This is because it will run the migration job which may not be desirable on every build.
+
+To run the indexing job:
+```console
+$ helm repo add hocs-helm-charts https://ukhomeoffice.github.io/hocs-helm-charts
+
+$ helm upgrade hocs-casework-search-indexer ./helm/hocs-casework-search-indexer \
+--dependency-update \
+--install \
+--reset-values \
+--timeout 10m \
+--history-max 2 \
+--namespace ${KUBE_NAMESPACE} \
+--set version=${VERSION}
+```
+
 
 ## Versioning
 
