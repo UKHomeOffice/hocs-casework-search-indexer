@@ -1,4 +1,4 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.repository.config.elastic;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.configuration.elastic;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpRequestInterceptor;
