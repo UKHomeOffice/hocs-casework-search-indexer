@@ -1,4 +1,4 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;

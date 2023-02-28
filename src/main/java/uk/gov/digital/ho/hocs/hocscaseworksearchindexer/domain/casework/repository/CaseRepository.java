@@ -1,10 +1,10 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.repository;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.CaseData;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.CaseData;
 
 import javax.persistence.QueryHint;
 import java.util.stream.Stream;

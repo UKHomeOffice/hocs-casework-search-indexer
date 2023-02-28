@@ -1,6 +1,5 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

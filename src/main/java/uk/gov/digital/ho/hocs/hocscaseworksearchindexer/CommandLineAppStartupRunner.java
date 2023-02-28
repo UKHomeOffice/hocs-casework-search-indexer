@@ -8,6 +8,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.exceptions.ElasticSearchFailureException;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.ETLService;
 
 import java.io.IOException;
 
@@ -16,19 +18,19 @@ import java.io.IOException;
 @Profile("!test")
 public class CommandLineAppStartupRunner implements CommandLineRunner {
 
-    private final ETLService ETLService;
+    private final ETLService etlService;
 
     private final ApplicationContext applicationContext;
 
-    public CommandLineAppStartupRunner(ETLService ETLService, ApplicationContext applicationContext) {
-        this.ETLService = ETLService;
+    public CommandLineAppStartupRunner(ETLService etlService, ApplicationContext applicationContext) {
+        this.etlService = etlService;
         this.applicationContext = applicationContext;
     }
 
     @Override
     public void run(String... args) throws IOException, InterruptedException {
         log.info("Application started");
-        ETLService.migrate();
+        etlService.migrate();
         log.info("Migration completed successfully, exiting");
         System.exit(SpringApplication.exit(applicationContext, () -> 0));
     }

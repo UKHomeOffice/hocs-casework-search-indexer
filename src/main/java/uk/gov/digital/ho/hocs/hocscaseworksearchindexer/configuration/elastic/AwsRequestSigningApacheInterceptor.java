@@ -10,7 +10,7 @@
  * CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions
  * and limitations under the License.
  */
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.config.elastic;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.configuration.elastic;
 
 import org.apache.http.*;
 import org.apache.http.client.utils.URIBuilder;

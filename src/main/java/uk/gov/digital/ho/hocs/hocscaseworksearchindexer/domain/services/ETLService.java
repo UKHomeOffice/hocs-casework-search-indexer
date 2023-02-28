@@ -1,4 +1,4 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterators;
@@ -15,11 +15,14 @@ import org.elasticsearch.client.indices.GetIndexResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.Correspondent;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.SomuItem;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.Topic;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.repository.CaseRepository;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.casework.model.CaseData;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseType;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.IndexMode;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.exceptions.ElasticSearchFailureException;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.Correspondent;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.SomuItem;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.Topic;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.repository.CaseRepository;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.CaseData;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

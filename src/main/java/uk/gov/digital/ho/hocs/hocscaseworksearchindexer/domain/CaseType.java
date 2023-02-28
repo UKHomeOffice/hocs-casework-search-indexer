@@ -1,4 +1,4 @@
-package uk.gov.digital.ho.hocs.hocscaseworksearchindexer;
+package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain;
 
 public enum CaseType {
     MIN,

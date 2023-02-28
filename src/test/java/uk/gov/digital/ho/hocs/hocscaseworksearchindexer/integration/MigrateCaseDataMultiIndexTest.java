@@ -1,6 +1,5 @@
 package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.javacrumbs.jsonunit.core.Option;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -14,7 +13,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.ETLService;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.ETLService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -66,21 +65,17 @@ class MigrateCaseDataMultiIndexTest {
         var testIndexResponse = highLevelClient.get(
             new GetRequest(String.format("%s-test", prefix), "14915b78-6977-42db-b343-0915a7f412a1"),
             RequestOptions.DEFAULT);
-        assertThat(testIndexResponse.getSourceAsMap().get("caseUUID")).isEqualTo(
-            "14915b78-6977-42db-b343-0915a7f412a1");
+        assertThat(testIndexResponse.getSourceAsMap()).containsEntry("caseUUID", "14915b78-6977-42db-b343-0915a7f412a1");
 
         var testAIndexResponse = highLevelClient.get(
             new GetRequest(String.format("%s-testa", prefix), "24915b78-6977-42db-b343-0915a7f412a1"),
             RequestOptions.DEFAULT);
-        assertThat(testAIndexResponse.getSourceAsMap().get("caseUUID")).isEqualTo(
-            "24915b78-6977-42db-b343-0915a7f412a1");
+        assertThat(testAIndexResponse.getSourceAsMap()).containsEntry("caseUUID", "24915b78-6977-42db-b343-0915a7f412a1");
 
         var testBIndexResponse = highLevelClient.get(
             new GetRequest(String.format("%s-testb", prefix), "34915b78-6977-42db-b343-0915a7f412a1"),
             RequestOptions.DEFAULT);
-        assertThat(testBIndexResponse.getSourceAsMap().get("caseUUID")).isEqualTo(
-            "34915b78-6977-42db-b343-0915a7f412a1");
-
+        assertThat(testBIndexResponse.getSourceAsMap()).containsEntry("caseUUID", "34915b78-6977-42db-b343-0915a7f412a1");
     }
 
 }

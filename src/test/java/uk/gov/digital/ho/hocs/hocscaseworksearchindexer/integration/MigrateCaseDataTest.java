@@ -1,6 +1,5 @@
 package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.javacrumbs.jsonunit.core.Option;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.client.RequestOptions;
@@ -14,7 +13,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.ETLService;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.ETLService;
 import java.io.IOException;
 import java.nio.file.Files;
 
