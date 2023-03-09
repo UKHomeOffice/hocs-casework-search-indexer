@@ -1,5 +1,4 @@
 ---
-
 app:
   image:
     repository: quay.io/ukhomeofficedigital/hocs-casework-search-indexer
@@ -11,9 +10,10 @@ app:
       cpu: 2000m
       memory: 2048Mi
   mode: SINGULAR
-  newIndex: 'false'
-  batchSize: '200'
-  batchInterval: '500'
-  elasticPrefix: '{{ .Release.Namespace }}-latest'
-
-
+  index:
+    baseline:
+    prefix:
+  batch:
+    size: '200'
+    interval: '500'
+  dataCreatedBefore:

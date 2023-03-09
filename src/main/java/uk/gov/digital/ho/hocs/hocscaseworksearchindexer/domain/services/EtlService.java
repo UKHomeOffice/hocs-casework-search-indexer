@@ -9,14 +9,10 @@ import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.client.indices.GetIndexResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseType;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.IndexMode;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.exceptions.ElasticSearchFailureException;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.Correspondent;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.SomuItem;
@@ -27,11 +23,8 @@ import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.Ca
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,134 +34,85 @@ import java.util.stream.Stream;
 
 @Slf4j
 @Service
-public class ETLService {
-
-    private IndexMode indexMode;
-
-    private final String prefix;
-
-    private final int batchSize;
-
-    private final boolean newIndex;
-
-    private final int batchInterval;
-
-    private final CaseRepository caseRepository;
+public class EtlService {
 
     private final RestHighLevelClient client;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    private final String liveIndex;
+    private final CaseRepository caseRepository;
 
-    private DateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
+    private final IndexService indexService;
 
-    private final  String databaseName;
+    private final int batchSize;
 
+    private final int batchInterval;
+
+    private final LocalDateTime dataCreatedBefore;
 
     @PersistenceContext
     protected EntityManager entityManager;
 
-    private final String timestamp;
-
-    public ETLService(@Value("${batch.size}") int batchSize,
-                      RestHighLevelClient client,
+    public EtlService(RestHighLevelClient client,
                       ObjectMapper objectMapper,
-                      @Value("${aws.es.index-prefix}") String prefix,
-                      @Value("${mode}") IndexMode indexMode,
-                      @Value("${new-index}") boolean newIndex,
                       CaseRepository caseRepository,
-                      @Value("${batch.interval}") int batchInterval,
-                      @Value("${db.name:unset}") String databaseName) {
-        this.batchSize = batchSize;
-        this.newIndex = newIndex;
-        this.caseRepository = caseRepository;
+                      IndexService indexService,
+                      @Value("${app.batch.size}") int batchSize,
+                      @Value("${app.batch.interval}") int batchInterval,
+                      @Value("${app.dataCreatedBefore}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataCreatedBefore) {
         this.client = client;
-        this.prefix = prefix;
         this.objectMapper = objectMapper;
-        this.liveIndex = String.format("%s-%s", prefix, "case");
-        this.indexMode = indexMode;
+        this.caseRepository = caseRepository;
+        this.indexService = indexService;
+        this.batchSize = batchSize;
         this.batchInterval = batchInterval;
-        this.databaseName = databaseName;
-        this.timestamp = dateFormat.format(Date.from(Instant.now()));
+        this.dataCreatedBefore = dataCreatedBefore;
+
+        log.info("Batch Size: {}", batchSize);
+        log.info("Batch Interval: {}", batchInterval);
+        log.info("Data Created Before: {}", dataCreatedBefore);
     }
 
     @Transactional(readOnly = true)
-    public void migrate() throws IOException, InterruptedException {
-
-        log.info("Indexing Mode: {}", indexMode);
-        log.info("Create New Index: {}", newIndex);
-        log.info("Batch Size: {}", batchSize);
-        log.info("Batch Interval: {}", batchInterval);
-        log.info("Indexing cases from {} to index with prefix {}", databaseName, prefix);
-        Thread.sleep(6000);
-
-        if (newIndex) {
-            createNewIndexes();
-        }
-
+    public void migrate() {
         AtomicInteger count = new AtomicInteger(0);
-        try (Stream<CaseData> cases = caseRepository.getAllCasesAndCollections()) {
+        AtomicInteger successCount = new AtomicInteger(0);
+
+        try (Stream<CaseData> cases = caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore)) {
             Iterators.partition(cases.iterator(), batchSize).forEachRemaining(batch -> {
                 BulkRequest bulkRequest = new BulkRequest();
                 batch.forEach(caseData -> {
                     count.incrementAndGet();
+                    successCount.incrementAndGet();
+
                     log.debug("Indexing case {} for UUID {}", count, caseData.getUuid());
                     entityManager.detach(caseData);
 
-                    bulkRequest.add(new UpdateRequest(getMigrationIndex(caseData.getType()), caseData.getUuid().toString())
+                    bulkRequest.add(new UpdateRequest(indexService.getIndexName(caseData.getType()), caseData.getUuid().toString())
                         .docAsUpsert(true)
                         .doc(mapCaseData(caseData)));
                 });
 
                 try {
                     BulkResponse bulkItemResponses = client.bulk(bulkRequest, RequestOptions.DEFAULT);
+
                     if (bulkItemResponses.hasFailures()) {
-                        Arrays.stream(bulkItemResponses.getItems()).filter(
-                            BulkItemResponse::isFailed).forEach(i->log.error("Failed to index case {} with error {} in index {}", i.getId(), i.getFailureMessage(), i.getIndex()));
+                        Arrays.stream(bulkItemResponses.getItems())
+                            .filter(BulkItemResponse::isFailed)
+                            .forEach(i-> {
+                                successCount.getAndDecrement();
+                                log.error("Failed to index case {} with error {} in index {}", i.getId(), i.getFailureMessage(), i.getIndex());
+                            });
                     }
+
                     Thread.sleep(batchInterval);
                 } catch (IOException | InterruptedException e) {
-                    log.error("Error indexing batch ", e.getMessage());
+                    log.error("Error indexing batch {}", e.getMessage());
                     throw new ElasticSearchFailureException("Failed to index batch", e);
                 }
             });
-        }
-    }
 
-    private String getMigrationIndex(String type) {
-        if (indexMode == IndexMode.SINGULAR) {
-            if (newIndex) {
-                return String.format("%s-%s-%s", prefix, "case", timestamp);
-            } else {
-                return liveIndex;
-            }
-        } else {
-            if(newIndex) {
-                return String.format("%s-%s-%s", prefix, type.toLowerCase(), timestamp);
-            } else {
-                return String.format("%s-%s", prefix, type.toLowerCase());
-            }
-        }
-    }
-
-    private void createNewIndexes() throws IOException {
-        GetIndexResponse getIndexResponse = client.indices().get(new GetIndexRequest(liveIndex),
-            RequestOptions.DEFAULT);
-        if (indexMode == IndexMode.SINGULAR) {
-            var index = getMigrationIndex(null);
-            log.info("Creating new index {} for migration", index);
-            client.indices().create(
-                new CreateIndexRequest(index).mapping(getIndexResponse.getMappings().get(liveIndex).sourceAsMap()),
-                RequestOptions.DEFAULT);
-        } else {
-            for (CaseType caseType : CaseType.values()) {
-                var index = getMigrationIndex(caseType.name());
-                log.info("Creating new index {} for migration", index);
-                client.indices().create(
-                    new CreateIndexRequest(index).source(getIndexResponse.getMappings().get(liveIndex).sourceAsMap()),
-                    RequestOptions.DEFAULT);
-            }
+            assert successCount.get() == count.get();
         }
     }
 
@@ -246,6 +190,6 @@ public class ETLService {
             indexMap.put("text", topic.getText());
             return indexMap;
         }).toList();
-
     }
+
 }

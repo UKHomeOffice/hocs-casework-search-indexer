@@ -4,16 +4,18 @@ import net.javacrumbs.jsonunit.core.Option;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.ETLService;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.EtlService;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.IndexService;
+
 import java.io.IOException;
 import java.nio.file.Files;
 
@@ -23,7 +25,7 @@ import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TES
 import static org.springframework.test.context.jdbc.SqlConfig.TransactionMode.ISOLATED;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(webEnvironment = RANDOM_PORT, properties = { "mode=SINGULAR" })
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = { "app.mode=SINGULAR" })
 @ActiveProfiles({ "localstack", "test" })
 @Sql(scripts = "classpath:case/beforeTest.sql", config = @SqlConfig(transactionMode = ISOLATED))
 @Sql(scripts = "classpath:case/afterTest.sql",
@@ -35,18 +37,23 @@ class MigrateCaseDataTest {
     private RestHighLevelClient highLevelClient;
 
     @Autowired
-    private ETLService etlService;
+    private EtlService etlService;
 
-    @Value("${aws.es.index-prefix}")
-    private String prefix;
+    @Autowired
+    private IndexService indexService;
+
+    @BeforeAll
+    static void setup(@Autowired IndexService indexService) throws IOException {
+        indexService.createIndexes();
+    }
+
     @Test
-    void createsCaseDocumentFromCaseData() throws IOException, InterruptedException {
-
+    void createsCaseDocumentFromCaseData() throws IOException {
         String expectedJSON =  Files.readString(new ClassPathResource("elastic-search/case-data.json").getFile().toPath());
 
         etlService.migrate();
 
-        var getRequest = new GetRequest(String.format("%s-case", prefix), "14915b78-6977-42db-b343-0915a7f412a1");
+        var getRequest = new GetRequest(indexService.getIndexName(null), "14915b78-6977-42db-b343-0915a7f412a1");
         var getResponse = highLevelClient.get(getRequest, RequestOptions.DEFAULT);
         var responseJson = getResponse.getSourceAsString();
 
