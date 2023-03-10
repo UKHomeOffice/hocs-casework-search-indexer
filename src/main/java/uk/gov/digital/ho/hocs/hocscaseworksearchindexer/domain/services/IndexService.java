@@ -114,7 +114,8 @@ public class IndexService {
                 "index.creation_date",
                 "index.provided_name",
                 "index.uuid",
-                "index.version.created");
+                "index.version.created",
+                "index.version.upgraded");
 
         private IndexSettings() { }
 
