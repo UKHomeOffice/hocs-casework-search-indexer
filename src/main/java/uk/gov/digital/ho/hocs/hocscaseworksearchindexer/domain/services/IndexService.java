@@ -70,13 +70,13 @@ public class IndexService {
         }
     }
 
-    private void createIndex(String type, Map<String, Object> indexSourceMap, Settings settings, boolean multipleSearchAlias) throws IOException {
+    private void createIndex(String type, Map<String, Object> indexMapping, Settings settings, boolean multipleSearchAlias) throws IOException {
         var indexName = getIndexName(type);
 
         var createIndexRequest = new CreateIndexRequest(indexName)
-            .source(indexSourceMap)
             .alias(new Alias(getTypeAliasName(type, true)).writeIndex(true))
             .alias(new Alias(getTypeAliasName(type, false)).writeIndex(false))
+            .mapping(indexMapping)
             .settings(settings);
 
         if (multipleSearchAlias) {
