@@ -8,4 +8,3 @@ app:
   index:
     baseline: local-case
     prefix: local
-  data-created-before:
