@@ -7,6 +7,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.client.indices.GetIndexResponse;
+import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseType;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -56,23 +58,26 @@ public class IndexService {
             RequestOptions.DEFAULT);
 
         var indexMapping = getIndexResponse.getMappings().get(baselineIndex).sourceAsMap();
+        var settings =
+            IndexSettings.getFilteredSettings(getIndexResponse.getSettings().get(baselineIndex));
 
         if (indexMode == IndexMode.SINGULAR) {
-            createIndex(null, indexMapping, false);
+            createIndex(null, indexMapping, settings, false);
         } else {
             for (CaseType caseType : CaseType.values()) {
-                createIndex(caseType.name(), indexMapping, true);
+                createIndex(caseType.name(), indexMapping, settings, true);
             }
         }
     }
 
-    private void createIndex(String type, Map<String, Object> indexSourceMap, boolean multipleSearchAlias) throws IOException {
+    private void createIndex(String type, Map<String, Object> indexSourceMap, Settings settings, boolean multipleSearchAlias) throws IOException {
         var indexName = getIndexName(type);
 
         var createIndexRequest = new CreateIndexRequest(indexName)
             .source(indexSourceMap)
             .alias(new Alias(getTypeAliasName(type, true)).writeIndex(true))
-            .alias(new Alias(getTypeAliasName(type, false)).writeIndex(false));
+            .alias(new Alias(getTypeAliasName(type, false)).writeIndex(false))
+            .settings(settings);
 
         if (multipleSearchAlias) {
             createIndexRequest.alias(new Alias(getGlobalReadAliasName()).writeIndex(false));
@@ -100,6 +105,29 @@ public class IndexService {
         }
 
         return String.format("%s-%s-%s-%s", prefix, timestamp, type.toLowerCase(), write ? "write" : "read");
+    }
+
+    static class IndexSettings {
+        private static final Set<String> excludedSettings =
+            Set.of("index.number_of_shards",
+                "index.number_of_replicas",
+                "index.creation_date",
+                "index.provided_name",
+                "index.uuid",
+                "index.version.created");
+
+        private IndexSettings() { }
+
+        public static Settings getFilteredSettings(Settings settings) {
+            var value = Settings.builder().put(settings);
+
+            for (String excludedSetting : excludedSettings) {
+                value.remove(excludedSetting);
+            }
+
+            return value.build();
+        }
+
     }
 
 }
