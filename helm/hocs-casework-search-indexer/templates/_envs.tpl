@@ -4,17 +4,17 @@
 - name: SPRING_PROFILES_ACTIVE
   value: 'aws'
 - name: APP_BATCH_SIZE
-  value: {{ .Values.app.batch.size }}
+  value: '{{ tpl .Values.app.batch.size . }}'
 - name: APP_BATCH_INTERVAL
-  value: {{ .Values.app.batch.interval }}
+  value: '{{ tpl .Values.app.batch.interval . }}'
 - name: APP_INDEX_BASELINE
-  value: {{ .Values.app.index.baseline }}
+  value: '{{ tpl .Values.app.index.baseline . }}'
 - name: APP_INDEX_PREFIX
-  value: {{ .Values.app.index.prefix }}
+  value: '{{ tpl .Values.app.index.prefix . }}'
 - name: APP_MODE
-  value: {{ .Values.app.mode }}
+  value: '{{ tpl .Values.app.mode . }}'
 - name: APP_DATACREATEDBEFORE
-  value: {{ .Values.app.dataCreatedBefore }}
+  value: '{{ tpl .Values.app.dataCreatedBefore . }}'
 - name: DB_HOST
   valueFrom:
     secretKeyRef:
