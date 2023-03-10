@@ -4,14 +4,15 @@ metadata:
   name: rebuild-os-indexes
   labels:
     version: {{ .Values.version }}
-    outbound: required
-    database: required
 spec:
   template:
     metadata:
       labels:
         name: hocs-casework-search-indexer
         role: hocs-backend
+        outbound: required
+        database: required
+        version: {{ .Values.version }}
     spec:
       containers:
         - name: hocs-casework-search-indexer
