@@ -5,6 +5,7 @@ metadata:
   labels:
     version: {{ .Values.version }}
 spec:
+  backoffLimit: 0
   template:
     metadata:
       labels:
