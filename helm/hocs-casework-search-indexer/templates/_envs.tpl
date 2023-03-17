@@ -14,7 +14,7 @@
 - name: APP_CREATE_TIMESTAMP
   value: '{{ tpl .Values.app.create.timestamp . }}'
 - name: APP_MIGRATE_ENABLED
-  value: '{{ tpl .Values.app.migrate.batch.enabled . }}'
+  value: '{{ tpl .Values.app.migrate.enabled . }}'
 - name: APP_MIGRATE_BATCH_SIZE
   value: '{{ tpl .Values.app.migrate.batch.size . }}'
 - name: APP_MIGRATE_BATCH_INTERVAL
