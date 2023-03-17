@@ -15,9 +15,14 @@ public class CaseTypeComponent {
     private final Set<String> types;
 
     public CaseTypeComponent(@Value("${app.migrate.types}") Set<String> types) {
-        this.types = Arrays.stream(CaseType.values()).map(
-            CaseType::name).filter(types::contains).collect(
-            Collectors.toSet());
+        if (!types.isEmpty()) {
+            this.types = Arrays.stream(CaseType.values()).map(
+                CaseType::name).filter(types::contains).collect(
+                Collectors.toSet());
+        } else {
+            this.types = Arrays.stream(CaseType.values()).map(
+                CaseType::name).collect(Collectors.toSet());
+        }
 
         log.info("Requested Types: {}", types);
         log.info("Matched Types: {}", this.types);
