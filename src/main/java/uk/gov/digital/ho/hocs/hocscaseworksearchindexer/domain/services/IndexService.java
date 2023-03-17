@@ -10,7 +10,7 @@ import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseType;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseTypeComponent;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.IndexMode;
 
 import java.io.IOException;
@@ -34,17 +34,22 @@ public class IndexService {
 
     private final String timestamp;
 
+    private final Set<String> types;
+
     public IndexService(RestHighLevelClient client,
-                        @Value("${app.index.baseline}") String baselineIndex,
-                        @Value("${app.index.prefix}") String prefix,
+                        CaseTypeComponent caseTypeComponent,
+                        @Value("${app.create.baseline}") String baselineIndex,
+                        @Value("${app.create.prefix}") String prefix,
+                        @Value("${app.create.timestamp}") String timestamp,
                         @Value("${app.mode}") IndexMode indexMode) {
         this.client = client;
         this.prefix = prefix;
         this.indexMode = indexMode;
         this.baselineIndex = baselineIndex;
+        this.types = caseTypeComponent.getTypes();
 
-        var dateFormat = new SimpleDateFormat("yyyyMMddHHmm");
-        this.timestamp = dateFormat.format(Date.from(Instant.now()));
+        var dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        this.timestamp = timestamp != null ? timestamp : dateFormat.format(Date.from(Instant.now()));
 
         log.info("Baseline Index: {}", baselineIndex);
         log.info("Indexing Mode: {}", indexMode);
@@ -53,31 +58,30 @@ public class IndexService {
     }
 
     public void createIndexes() throws IOException {
-        GetIndexResponse getIndexResponse =
-            client.indices().get(new GetIndexRequest(baselineIndex),
+        GetIndexResponse getIndexResponse = client.indices().get(new GetIndexRequest(baselineIndex),
             RequestOptions.DEFAULT);
 
         var indexMapping = getIndexResponse.getMappings().get(baselineIndex).sourceAsMap();
-        var settings =
-            IndexSettings.getFilteredSettings(getIndexResponse.getSettings().get(baselineIndex));
+        var settings = IndexSettings.getFilteredSettings(getIndexResponse.getSettings().get(baselineIndex));
 
         if (indexMode == IndexMode.SINGULAR) {
             createIndex(null, indexMapping, settings, false);
         } else {
-            for (CaseType caseType : CaseType.values()) {
-                createIndex(caseType.name(), indexMapping, settings, true);
+            for (String caseType : this.types) {
+                createIndex(caseType, indexMapping, settings, true);
             }
         }
     }
 
-    private void createIndex(String type, Map<String, Object> indexMapping, Settings settings, boolean multipleSearchAlias) throws IOException {
+    private void createIndex(String type,
+                             Map<String, Object> indexMapping,
+                             Settings settings,
+                             boolean multipleSearchAlias) throws IOException {
         var indexName = getIndexName(type);
 
-        var createIndexRequest = new CreateIndexRequest(indexName)
-            .alias(new Alias(getTypeAliasName(type, true)).writeIndex(true))
-            .alias(new Alias(getTypeAliasName(type, false)).writeIndex(false))
-            .mapping(indexMapping)
-            .settings(settings);
+        var createIndexRequest = new CreateIndexRequest(indexName).alias(
+            new Alias(getTypeAliasName(type, true)).writeIndex(true)).alias(
+            new Alias(getTypeAliasName(type, false)).writeIndex(false)).mapping(indexMapping).settings(settings);
 
         if (multipleSearchAlias) {
             createIndexRequest.alias(new Alias(getGlobalReadAliasName()).writeIndex(false));
@@ -108,16 +112,12 @@ public class IndexService {
     }
 
     static class IndexSettings {
-        private static final Set<String> excludedSettings =
-            Set.of("index.number_of_shards",
-                "index.number_of_replicas",
-                "index.creation_date",
-                "index.provided_name",
-                "index.uuid",
-                "index.version.created",
-                "index.version.upgraded");
 
-        private IndexSettings() { }
+        private static final Set<String> excludedSettings = Set.of("index.number_of_shards", "index.number_of_replicas",
+            "index.creation_date", "index.provided_name", "index.uuid", "index.version.created",
+            "index.version.upgraded");
+
+        private IndexSettings() {}
 
         public static Settings getFilteredSettings(Settings settings) {
             var value = Settings.builder().put(settings);

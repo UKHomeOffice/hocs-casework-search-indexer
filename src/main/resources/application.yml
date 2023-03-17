@@ -23,11 +23,16 @@ spring:
     url: jdbc:postgresql://${db.host:localhost}:${db.port:5432}/${db.name:postgres}?currentSchema=${db.schema.name:casework}&user=${db.username:root}&password=${db.password:dev}&stringtype=unspecified
 
 app:
-  index:
+  mode: MULTIPLE
+  create:
+    enabled: true
     baseline:
     prefix:
-  mode: MULTIPLE
-  batch:
-    size: 1000
-    interval: 200
-  data-created-before:
+    timestamp:
+  migrate:
+    enabled: true
+    batch:
+      size: 1000
+      interval: 200
+    dataCreatedBefore:
+    types:

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseTypeComponent;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.exceptions.ElasticSearchFailureException;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.Correspondent;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.SomuItem;
@@ -50,6 +51,8 @@ public class EtlService {
 
     private final LocalDateTime dataCreatedBefore;
 
+    private final Set<String> types;
+
     @PersistenceContext
     protected EntityManager entityManager;
 
@@ -57,9 +60,10 @@ public class EtlService {
                       ObjectMapper objectMapper,
                       CaseRepository caseRepository,
                       IndexService indexService,
-                      @Value("${app.batch.size}") int batchSize,
-                      @Value("${app.batch.interval}") int batchInterval,
-                      @Value("${app.dataCreatedBefore}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataCreatedBefore) {
+                      CaseTypeComponent caseTypeComponent,
+                      @Value("${app.migrate.batch.size}") int batchSize,
+                      @Value("${app.migrate.batch.interval}") int batchInterval,
+                      @Value("${app.migrate.dataCreatedBefore}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataCreatedBefore) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.caseRepository = caseRepository;
@@ -67,10 +71,12 @@ public class EtlService {
         this.batchSize = batchSize;
         this.batchInterval = batchInterval;
         this.dataCreatedBefore = dataCreatedBefore;
+        this.types = caseTypeComponent.getTypes();
 
         log.info("Batch Size: {}", batchSize);
         log.info("Batch Interval: {}", batchInterval);
         log.info("Data Created Before: {}", dataCreatedBefore);
+
     }
 
     @Transactional(readOnly = true)
@@ -78,7 +84,10 @@ public class EtlService {
         AtomicInteger count = new AtomicInteger(0);
         AtomicInteger successCount = new AtomicInteger(0);
 
-        try (Stream<CaseData> cases = caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore)) {
+        try (Stream<CaseData> cases = types.isEmpty() ?
+            caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore) :
+            caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore, types)) {
+
             Iterators.partition(cases.iterator(), batchSize).forEachRemaining(batch -> {
                 BulkRequest bulkRequest = new BulkRequest();
                 batch.forEach(caseData -> {

@@ -3,18 +3,26 @@
   value: '-XX:MaxRAMPercentage=70 -Djava.security.egd=file:/dev/./urandom -Dhttps.proxyHost=hocs-outbound-proxy.{{ .Release.Namespace }}.svc.cluster.local -Dhttps.proxyPort=31290 -Dhttp.nonProxyHosts=*.{{ .Release.Namespace }}.svc.cluster.local'
 - name: SPRING_PROFILES_ACTIVE
   value: 'aws'
-- name: APP_BATCH_SIZE
-  value: '{{ tpl .Values.app.batch.size . }}'
-- name: APP_BATCH_INTERVAL
-  value: '{{ tpl .Values.app.batch.interval . }}'
-- name: APP_INDEX_BASELINE
-  value: '{{ tpl .Values.app.index.baseline . }}'
-- name: APP_INDEX_PREFIX
-  value: '{{ tpl .Values.app.index.prefix . }}'
 - name: APP_MODE
   value: '{{ tpl .Values.app.mode . }}'
-- name: APP_DATACREATEDBEFORE
-  value: '{{ tpl .Values.app.dataCreatedBefore . }}'
+- name: APP_CREATE_ENABLED
+  value: '{{ tpl .Values.app.create.enabled . }}'
+- name: APP_CREATE_BASELINE
+  value: '{{ tpl .Values.app.create.baseline . }}'
+- name: APP_CREATE_PREFIX
+  value: '{{ tpl .Values.app.create.prefix . }}'
+- name: APP_CREATE_TIMESTAMP
+  value: '{{ tpl .Values.app.create.timestamp . }}'
+- name: APP_MIGRATE_ENABLED
+  value: '{{ tpl .Values.app.migrate.batch.enabled . }}'
+- name: APP_MIGRATE_BATCH_SIZE
+  value: '{{ tpl .Values.app.migrate.batch.size . }}'
+- name: APP_MIGRATE_BATCH_INTERVAL
+  value: '{{ tpl .Values.app.migrate.batch.interval . }}'
+- name: APP_MIGRATE_DATACREATEDBEFORE
+  value: '{{ tpl .Values.app.migrate.dataCreatedBefore . }}'
+- name: APP_MIGRATE_TYPES
+  value: '{{ tpl .Values.app.migrate.types . }}'
 - name: DB_HOST
   valueFrom:
     secretKeyRef:
