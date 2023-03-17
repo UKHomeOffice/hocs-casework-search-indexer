@@ -5,22 +5,28 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
+import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseTypeComponent;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.EtlService;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.services.IndexService;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Set;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.test.context.jdbc.SqlConfig.TransactionMode.ISOLATED;
@@ -43,9 +49,17 @@ class MigrateCaseDataMultiIndexTest {
     @Autowired
     private EtlService etlService;
 
+    @MockBean
+    private CaseTypeComponent caseTypeComponent;
+
     @BeforeAll
     static void setup(@Autowired IndexService indexService) throws IOException {
         indexService.createIndexes();
+    }
+
+    @BeforeEach
+    void setup() {
+        when(caseTypeComponent.getTypes()).thenReturn(Set.of("TEST"));
     }
 
     @Test
