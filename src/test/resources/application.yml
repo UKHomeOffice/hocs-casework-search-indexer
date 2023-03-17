@@ -20,11 +20,16 @@ spring:
     schemas: ${db.schema.name:caseworkindexer}
 
 app:
-  index:
+  mode: MULTIPLE
+  create:
+    enabled: true
     baseline: local-case
     prefix: local
-  mode: MULTIPLE
-  batch:
-    size: 5
-    interval: 0
-  dataCreatedBefore: 2023-01-01T00:00:00.000Z
+    timestamp:
+  migrate:
+    enabled: true
+    batch:
+      size: 5
+      interval: 0
+    dataCreatedBefore: 2023-01-01T00:00:00.000Z
+    types:

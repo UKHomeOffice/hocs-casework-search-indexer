@@ -5,6 +5,6 @@ aws:
     port: 4566
 
 app:
-  index:
+  create:
     baseline: local-case
     prefix: local
