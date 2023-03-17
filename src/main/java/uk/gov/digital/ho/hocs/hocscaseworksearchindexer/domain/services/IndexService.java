@@ -10,6 +10,7 @@ import org.elasticsearch.client.indices.GetIndexResponse;
 import org.elasticsearch.common.settings.Settings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseTypeComponent;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.IndexMode;
 
@@ -49,12 +50,14 @@ public class IndexService {
         this.types = caseTypeComponent.getTypes();
 
         var dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        this.timestamp = timestamp != null ? timestamp : dateFormat.format(Date.from(Instant.now()));
+        this.timestamp = StringUtils.hasText(timestamp)
+            ? timestamp
+            : dateFormat.format(Date.from(Instant.now()));
 
         log.info("Baseline Index: {}", baselineIndex);
         log.info("Indexing Mode: {}", indexMode);
         log.info("Index prefix: {}", prefix);
-        log.info("Index timestamp: {}", timestamp);
+        log.info("Index timestamp: {}", this.timestamp);
     }
 
     public void createIndexes() throws IOException {
