@@ -53,6 +53,8 @@ public class EtlService {
 
     private final Set<String> types;
 
+    private final int startingOffset;
+
     @PersistenceContext
     protected EntityManager entityManager;
 
@@ -63,7 +65,8 @@ public class EtlService {
                       CaseTypeComponent caseTypeComponent,
                       @Value("${app.migrate.batch.size}") int batchSize,
                       @Value("${app.migrate.batch.interval}") int batchInterval,
-                      @Value("${app.migrate.dataCreatedBefore}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataCreatedBefore) {
+                      @Value("${app.migrate.dataCreatedBefore}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataCreatedBefore,
+                      @Value("${app.migrate.offset}") int startingOffset) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.caseRepository = caseRepository;
@@ -73,9 +76,16 @@ public class EtlService {
         this.dataCreatedBefore = dataCreatedBefore;
         this.types = caseTypeComponent.getTypes();
 
+        if (types.size() == 1) {
+            this.startingOffset = startingOffset;
+        } else {
+            this.startingOffset = 0;
+        }
+
         log.info("Batch Size: {}", batchSize);
         log.info("Batch Interval: {}", batchInterval);
         log.info("Data Created Before: {}", dataCreatedBefore);
+        log.info("Starting Offset: {}", startingOffset);
 
     }
 
@@ -86,7 +96,7 @@ public class EtlService {
 
         try (Stream<CaseData> cases = types.isEmpty() ?
             caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore) :
-            caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore, types)) {
+            caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore, types).skip(startingOffset)) {
 
             Iterators.partition(cases.iterator(), batchSize).forEachRemaining(batch -> {
                 BulkRequest bulkRequest = new BulkRequest();

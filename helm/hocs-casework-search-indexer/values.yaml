@@ -22,3 +22,4 @@ app:
       interval: '5000'
     dataCreatedBefore:
     types:
+    offset:
