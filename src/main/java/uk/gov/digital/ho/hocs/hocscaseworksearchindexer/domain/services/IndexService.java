@@ -116,9 +116,8 @@ public class IndexService {
 
     static class IndexSettings {
 
-        private static final Set<String> excludedSettings = Set.of("index.number_of_shards", "index.number_of_replicas",
-            "index.creation_date", "index.provided_name", "index.uuid", "index.version.created",
-            "index.version.upgraded");
+        private static final Set<String> excludedSettings = Set.of("index.creation_date", "index.provided_name",
+            "index.uuid", "index.version.created", "index.version.upgraded");
 
         private IndexSettings() {}
 
