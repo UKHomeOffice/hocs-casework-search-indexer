@@ -161,6 +161,7 @@ public class EtlService {
         }
 
         indexMap.put("deleted", caseData.isDeleted());
+        indexMap.put("completed", caseData.isCompleted());
         indexMap.put("caseUUID", caseData.getUuid());
         indexMap.put("data", caseData.getDataMap());
         indexMap.put("currentCorrespondents", mapCorrespondents(caseData.getCurrentCorrespondents()));
