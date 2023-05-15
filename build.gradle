@@ -38,7 +38,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
-    testImplementation 'org.flywaydb:flyway-core:9.17.0'
+    testImplementation 'org.flywaydb:flyway-core:9.18.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'net.javacrumbs.json-unit:json-unit-assertj:2.37.0'
 }
