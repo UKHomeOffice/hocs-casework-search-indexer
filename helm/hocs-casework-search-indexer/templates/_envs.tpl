@@ -19,8 +19,10 @@
   value: '{{ tpl .Values.app.migrate.batch.size . }}'
 - name: APP_MIGRATE_BATCH_INTERVAL
   value: '{{ tpl .Values.app.migrate.batch.interval . }}'
-- name: APP_MIGRATE_DATACREATEDBEFORE
-  value: '{{ tpl .Values.app.migrate.dataCreatedBefore . }}'
+- name: APP_MIGRATE_STARTDATE
+  value: '{{ tpl .Values.app.migrate.startDate . }}'
+- name: APP_MIGRATE_ENDDATE
+  value: '{{ tpl .Values.app.migrate.endDate . }}'
 - name: APP_MIGRATE_TYPES
   value: '{{ tpl .Values.app.migrate.types . }}'
 - name: DB_HOST

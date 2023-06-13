@@ -59,7 +59,7 @@ class MigrateCaseDataMultiIndexTest {
 
     @BeforeEach
     void setup() {
-        when(caseTypeComponent.getTypes()).thenReturn(Set.of("TEST"));
+        when(caseTypeComponent.getTypes()).thenReturn(Set.of("TEST", "TESTA", "TESTB"));
     }
 
     @Test

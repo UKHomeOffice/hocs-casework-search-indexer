@@ -34,6 +34,7 @@ app:
     batch:
       size: 1000
       interval: 200
-    dataCreatedBefore:
+    startDate:
+    endDate:
     types:
     offset: 0
