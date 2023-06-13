@@ -129,6 +129,8 @@ public class EtlService {
                     log.error("Error indexing batch {}", e.getMessage());
                     throw new ElasticSearchFailureException("Failed to index batch", e);
                 }
+
+                log.info("Indexed {} cases", count);
             });
 
             assert successCount.get() == count.get();
