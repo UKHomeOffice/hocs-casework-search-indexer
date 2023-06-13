@@ -61,6 +61,9 @@ public class CaseData implements Serializable {
     @Column(name = "completed")
     private boolean completed;
 
+    @Column(name = "migrated_reference")
+    private String migratedReference;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "caseUUID", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Correspondent> correspondents = new LinkedHashSet<>();
 

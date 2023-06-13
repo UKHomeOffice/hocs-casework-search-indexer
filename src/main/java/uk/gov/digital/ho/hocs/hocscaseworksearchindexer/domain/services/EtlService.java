@@ -177,6 +177,9 @@ public class EtlService {
         if (caseData.getCaseDeadline() != null) {
             indexMap.put("caseDeadline", caseData.getCaseDeadline());
         }
+        if (caseData.getMigratedReference() != null) {
+            indexMap.put("migratedReference", caseData.getMigratedReference());
+        }
 
         indexMap.put("deleted", caseData.isDeleted());
         indexMap.put("completed", caseData.isCompleted());
