@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.CaseTypeComponent;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.exceptions.ElasticSearchFailureException;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.Correspondent;
@@ -45,13 +46,15 @@ public class EtlService {
 
     private final IndexService indexService;
 
+    private final CaseTypeComponent caseTypeComponent;
+
     private final int batchSize;
 
     private final int batchInterval;
 
-    private final LocalDateTime dataCreatedBefore;
+    private final LocalDateTime startDate;
 
-    private final Set<String> types;
+    private final LocalDateTime endDate;
 
     private final int startingOffset;
 
@@ -65,28 +68,25 @@ public class EtlService {
                       CaseTypeComponent caseTypeComponent,
                       @Value("${app.migrate.batch.size}") int batchSize,
                       @Value("${app.migrate.batch.interval}") int batchInterval,
-                      @Value("${app.migrate.dataCreatedBefore}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dataCreatedBefore,
+                      @Value("${app.migrate.startDate}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                      @Value("${app.migrate.endDate}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                       @Value("${app.migrate.offset}") int startingOffset) {
         this.client = client;
         this.objectMapper = objectMapper;
         this.caseRepository = caseRepository;
         this.indexService = indexService;
+        this.caseTypeComponent = caseTypeComponent;
         this.batchSize = batchSize;
         this.batchInterval = batchInterval;
-        this.dataCreatedBefore = dataCreatedBefore;
-        this.types = caseTypeComponent.getTypes();
-
-        if (types.size() == 1) {
-            this.startingOffset = startingOffset;
-        } else {
-            this.startingOffset = 0;
-        }
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.startingOffset = startingOffset;
 
         log.info("Batch Size: {}", batchSize);
         log.info("Batch Interval: {}", batchInterval);
-        log.info("Data Created Before: {}", dataCreatedBefore);
+        log.info("Start Date: {}", startDate);
+        log.info("End Date: {}", endDate);
         log.info("Starting Offset: {}", startingOffset);
-
     }
 
     @Transactional(readOnly = true)
@@ -94,10 +94,10 @@ public class EtlService {
         AtomicInteger count = new AtomicInteger(0);
         AtomicInteger successCount = new AtomicInteger(0);
 
-        try (Stream<CaseData> cases = types.isEmpty() ?
-            caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore) :
-            caseRepository.getAllCasesAndCollectionsBefore(dataCreatedBefore, types).skip(startingOffset)) {
+        Set<String> caseTypes = caseTypeComponent.getTypes();
+        int offset = caseTypes.size() == 1 ? startingOffset : 0;
 
+        try (Stream<CaseData> cases = getCaseDataStream(caseTypes).skip(offset)) {
             Iterators.partition(cases.iterator(), batchSize).forEachRemaining(batch -> {
                 BulkRequest bulkRequest = new BulkRequest();
                 batch.forEach(caseData -> {
@@ -132,6 +132,22 @@ public class EtlService {
             });
 
             assert successCount.get() == count.get();
+        }
+    }
+
+    private Stream<CaseData> getCaseDataStream(Set<String> caseTypes) {
+        if (startDate != null && StringUtils.hasText(startDate.toString())) {
+            if (endDate != null && StringUtils.hasText(endDate.toString())) {
+                return caseRepository.getAllCasesAndCollectionsBetween(startDate, endDate, caseTypes);
+            } else {
+                return caseRepository.getAllCasesAndCollectionsAfter(startDate, caseTypes);
+            }
+        } else {
+            if (endDate != null && StringUtils.hasText(endDate.toString())) {
+                return caseRepository.getAllCasesAndCollectionsBefore(endDate, caseTypes);
+            } else {
+                return caseRepository.getAllCasesAndCollections(caseTypes);
+            }
         }
     }
 
