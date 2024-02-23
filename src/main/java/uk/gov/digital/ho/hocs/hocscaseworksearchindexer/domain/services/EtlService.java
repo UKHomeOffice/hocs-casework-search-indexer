@@ -22,8 +22,8 @@ import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.To
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.repository.CaseRepository;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.CaseData;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;

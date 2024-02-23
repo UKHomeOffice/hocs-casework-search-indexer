@@ -7,7 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model.CaseData;
 
-import javax.persistence.QueryHint;
+import jakarta.persistence.QueryHint;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Stream;

@@ -5,16 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@Convert(attributeName = "jsonb", converter = JsonBinaryType.class)
 @NoArgsConstructor
 @Entity
 @Table(name = "somu_item")
@@ -36,7 +35,7 @@ public class SomuItem implements Serializable {
     @Column(name = "somu_uuid")
     private UUID somuUuid;
 
-    @Type(type = "jsonb")
+    @Type(value = JsonBinaryType.class)
     @Column(name = "data", columnDefinition = "jsonb")
     private Map<String, Object> data = new HashMap<>(0);
 
