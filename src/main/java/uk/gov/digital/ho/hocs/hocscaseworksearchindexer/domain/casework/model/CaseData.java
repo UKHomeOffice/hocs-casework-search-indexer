@@ -2,10 +2,11 @@ package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import org.hibernate.annotations.Type;
 
 import jakarta.persistence.*;
-import org.hibernate.usertype.UserType;
+
+import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Table(name = "case_data")
 @Getter
 @Setter
+@SuppressWarnings("JpaAttributeTypeInspection")
 public class CaseData implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +42,7 @@ public class CaseData implements Serializable {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Type(value = UserType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "data", columnDefinition = "jsonb")
     private Map<String, String> dataMap = new HashMap<>(0);
 

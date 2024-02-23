@@ -4,9 +4,11 @@ import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import jakarta.persistence.*;
+import org.hibernate.type.SqlTypes;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @Table(name = "somu_item")
 @Getter
 @Setter
+@SuppressWarnings("JpaAttributeTypeInspection")
 public class SomuItem implements Serializable {
 
     @Id
@@ -35,7 +38,7 @@ public class SomuItem implements Serializable {
     @Column(name = "somu_uuid")
     private UUID somuUuid;
 
-    @Type(value = JsonBinaryType.class)
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "data", columnDefinition = "jsonb")
     private Map<String, Object> data = new HashMap<>(0);
 
