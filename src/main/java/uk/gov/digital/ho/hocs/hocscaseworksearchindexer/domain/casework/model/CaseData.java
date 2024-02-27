@@ -2,22 +2,25 @@ package uk.gov.digital.ho.hocs.hocscaseworksearchindexer.domain.casework.model;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
+import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.JdbcTypeCode;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@Convert(attributeName = "jsonb", converter = JsonBinaryType.class)
 @NoArgsConstructor
 @Entity
 @Table(name = "case_data")
 @Getter
 @Setter
+@SuppressWarnings("JpaAttributeTypeInspection")
 public class CaseData implements Serializable {
 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +42,7 @@ public class CaseData implements Serializable {
     @Column(name = "deleted")
     private boolean deleted;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "data", columnDefinition = "jsonb")
     private Map<String, String> dataMap = new HashMap<>(0);
 
